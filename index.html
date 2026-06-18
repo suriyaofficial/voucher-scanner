@@ -138,15 +138,17 @@ const OFFICE_URL =
 
 const MOBILE_URL =
 "https://script.google.com/macros/s/AKfycbwmH87DzIWMQXvsxhvOk_M3vu-wq20cGx-l7szvi66XIWlyOEjGv-D61jxTja5kCGK6/exec";
-
+const beep = new Audio(
+  "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+);
 function onScanSuccess(decodedText){
-
+ beep.play();
+ if (navigator.vibrate) {
+   navigator.vibrate([200,100,200]);
+ }
 currentVoucher =
 extractVoucherCode(decodedText);
 
-if (navigator.vibrate) {
-  navigator.vibrate([200,100,200]);
-}
 document.getElementById("result")
 .innerHTML =
 "⏳ Checking Voucher...";
@@ -217,11 +219,16 @@ await res.json();
 document.getElementById("result")
 .innerHTML =
 "✅ Voucher Found";
+
+if(!data.success){
+
 document.getElementById("result")
 .innerHTML =
 "❌ Voucher Not Found";
 
-alert("Voucher not found");
+alert("Voucher not found");;
+return;
+}
 
 document.getElementById("voucherCard")
 .style.display="block";
