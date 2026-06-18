@@ -63,7 +63,21 @@ Mobile Mode
 </label>
 
 </div>
+<div style="margin:20px;">
 
+DH-
+
+<input
+type="text"
+id="manualVoucher"
+placeholder="SCB-65"
+style="text-transform:uppercase;">
+
+<button onclick="manualSearch()">
+Search
+</button>
+
+</div>
 <div id="reader"></div>
 
 <div id="result">
@@ -145,7 +159,7 @@ document.getElementById("result")
 fetch(
 OFFICE_URL +
 "?voucher=" +
-encodeURIComponent(decodedText),
+encodeURIComponent(currentVoucher),
 {
 method:"GET",
 mode:"no-cors"
@@ -157,7 +171,7 @@ scanner.stop();
 return;
 }
 
-loadVoucher(decodedText);
+
 
 }
 function extractVoucherCode(text){
@@ -292,6 +306,59 @@ onScanSuccess
 );
 
 }
+  function manualSearch(){
+
+  const value =
+document.getElementById(
+"manualVoucher"
+).value.trim().toUpperCase();
+
+  if(!value){
+    return;
+  }
+
+  currentVoucher =
+  "DH-" + value;
+
+  const mode =
+  document.querySelector(
+  'input[name="mode"]:checked'
+  ).value;
+
+  if(mode==="office"){
+
+    fetch(
+      OFFICE_URL +
+      "?voucher=" +
+      encodeURIComponent(currentVoucher),
+      {
+        method:"GET",
+        mode:"no-cors"
+      }
+    );
+
+    alert(
+      "Sent : " +
+      currentVoucher
+    );
+
+    return;
+  }
+
+  loadVoucher(currentVoucher);
+
+}
+  document
+.getElementById("manualVoucher")
+.addEventListener(
+"keypress",
+function(e){
+
+if(e.key==="Enter"){
+manualSearch();
+}
+
+});
 
 startScanner();
 
