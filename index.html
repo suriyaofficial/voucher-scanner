@@ -144,6 +144,13 @@ function onScanSuccess(decodedText){
 currentVoucher =
 extractVoucherCode(decodedText);
 
+if (navigator.vibrate) {
+  navigator.vibrate([200,100,200]);
+}
+document.getElementById("result")
+.innerHTML =
+"⏳ Checking Voucher...";
+
 const mode =
 document.querySelector(
 'input[name="mode"]:checked'
@@ -207,12 +214,14 @@ encodeURIComponent(voucherId),
 
 const data =
 await res.json();
-
-if(!data.success){
+document.getElementById("result")
+.innerHTML =
+"✅ Voucher Found";
+document.getElementById("result")
+.innerHTML =
+"❌ Voucher Not Found";
 
 alert("Voucher not found");
-return;
-}
 
 document.getElementById("voucherCard")
 .style.display="block";
