@@ -15,8 +15,10 @@ text-align:center;
 }
 
 #reader{
-width:350px;
+width:95vw;
+height:75vh;
 margin:auto;
+max-width:1000px;
 }
 
 .card{
@@ -139,7 +141,7 @@ const OFFICE_URL =
 const MOBILE_URL =
 "https://script.google.com/macros/s/AKfycbwmH87DzIWMQXvsxhvOk_M3vu-wq20cGx-l7szvi66XIWlyOEjGv-D61jxTja5kCGK6/exec";
 const beep = new Audio(
-  "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+  "https://actions.google.com/sounds/v1/cartoon/pop.ogg"
 );
 function onScanSuccess(decodedText){
  beep.play();
@@ -326,8 +328,11 @@ scanner.start(
 facingMode:"environment"
 },
 {
-fps:10,
-qrbox:250
+fps:15,
+qrbox:{
+width:350,
+height:350
+}
 },
 onScanSuccess
 );
