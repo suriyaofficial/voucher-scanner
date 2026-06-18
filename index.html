@@ -82,9 +82,7 @@ Search
 </div>
 <div id="reader"></div>
 
-<div id="result">
-Waiting for scan...
-</div>
+
 
 <div class="card" id="voucherCard">
 
@@ -125,7 +123,9 @@ CLEAR
 </button>
 
 </div>
-
+<div id="result">
+Waiting for scan...
+</div>
 <button onclick="resetScanner()">
 Restart Scanner
 </button>
@@ -145,15 +145,16 @@ const beep = new Audio(
 );
 function onScanSuccess(decodedText){
  beep.play();
+ document.getElementById("result")
+.innerHTML =
+"⏳ Checking Voucher...";
  if (navigator.vibrate) {
    navigator.vibrate([200,100,200]);
  }
 currentVoucher =
 extractVoucherCode(decodedText);
 
-document.getElementById("result")
-.innerHTML =
-"⏳ Checking Voucher...";
+
 
 const mode =
 document.querySelector(
