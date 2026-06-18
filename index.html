@@ -55,7 +55,12 @@ let scanner;
 function onScanSuccess(decodedText) {
 
   document.getElementById("result").innerHTML =
-    "Voucher: " + decodedText;
+"Voucher: " + decodedText;
+
+fetch(
+"https://script.google.com/macros/s/AKfycbzk36B1xp3K6RzlxrhyLuGc_N-m7se3nwhnck5sH67NykMYjRzEdL-LIEmep3cpNDFsSA/exec"
++ encodeURIComponent(decodedText)
+);
 
   scanner.stop();
 
