@@ -295,48 +295,69 @@ resetScanner();
 
 }
 
-function resetScanner(){
+async function resetScanner(){
 
-document.getElementById("voucherCard")
-.style.display="none";
+  document.getElementById("voucherCard")
+    .style.display = "none";
 
-document.getElementById("result")
-.innerHTML=
-"Waiting for scan...";
+  document.getElementById("customer")
+    .innerText = "";
 
-startScanner();
+  document.getElementById("voucher")
+    .innerText = "";
+
+  document.getElementById("type")
+    .innerText = "";
+
+  document.getElementById("expiry")
+    .innerText = "";
+
+  document.getElementById("status")
+    .innerText = "";
+
+  document.getElementById("result")
+    .innerHTML = "Opening Scanner...";
+
+  if(scanner){
+
+    try{
+      await scanner.stop();
+    }catch(e){}
+
+    try{
+      await scanner.clear();
+    }catch(e){}
+
+    scanner = null;
+  }
+
+  setTimeout(() => {
+    startScanner();
+  }, 300);
 
 }
+async function startScanner(){
 
-function startScanner(){
+  document.getElementById("result")
+    .innerHTML = "📷 Scanner Ready";
 
-if(scanner){
+  scanner = new Html5Qrcode("reader");
 
-try{
-scanner.stop();
-}catch(e){}
-
-try{
-scanner.clear();
-}catch(e){}
-}
-
-scanner=
-new Html5Qrcode("reader");
-
-scanner.start(
-{
-facingMode:"environment"
-},
-{
-fps:15,
-
-},
-onScanSuccess
-);
+  await scanner.start(
+    {
+      facingMode:"environment"
+    },
+    {
+      fps:15,
+      
+    },
+    onScanSuccess
+  );
 
 }
-  function manualSearch(){
+  
+
+function manualSearch(){
 
   const value =
 document.getElementById(
