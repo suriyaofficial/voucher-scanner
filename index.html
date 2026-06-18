@@ -140,7 +140,7 @@ const MOBILE_URL =
 "https://script.google.com/macros/s/AKfycbyWxA4-nIxvheiIWOeIXEL7rwetJSoQKsXW6PkTeZFqRp9IRbi6c6tZbIlTVgkoal8Ojg/exec";
 
 function onScanSuccess(decodedText){
-alert(decodedText);
+
 currentVoucher =
 extractVoucherCode(decodedText);
 
@@ -154,7 +154,7 @@ if(mode==="office"){
 document.getElementById("result")
 .innerHTML=
 "Sending to dashboard : "
-+ decodedText;
++ currentVoucher;
 
 fetch(
 OFFICE_URL +
@@ -169,6 +169,12 @@ mode:"no-cors"
 scanner.stop();
 
 return;
+}
+
+/* MOBILE MODE */
+
+loadVoucher(currentVoucher);
+
 }
 
 
