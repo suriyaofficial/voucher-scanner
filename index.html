@@ -140,7 +140,7 @@ const MOBILE_URL =
 "https://script.google.com/macros/s/AKfycbyWxA4-nIxvheiIWOeIXEL7rwetJSoQKsXW6PkTeZFqRp9IRbi6c6tZbIlTVgkoal8Ojg/exec";
 
 function onScanSuccess(decodedText){
-
+alert(decodedText);
 currentVoucher =
 extractVoucherCode(decodedText);
 
@@ -187,11 +187,16 @@ function extractVoucherCode(text){
 }
 async function loadVoucher(voucherId){
 
+
 const res =
 await fetch(
 MOBILE_URL +
 "?action=check&voucher=" +
-encodeURIComponent(voucherId)
+encodeURIComponent(voucherId),
+{
+  method:"GET",
+  mode:"cors"
+}
 );
 
 const data =
