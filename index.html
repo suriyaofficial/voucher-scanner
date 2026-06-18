@@ -55,19 +55,18 @@ let scanner;
 function onScanSuccess(decodedText) {
 
   document.getElementById("result").innerHTML =
-"Voucher: " + decodedText;
+    "Voucher: " + decodedText;
 
-fetch(
-"https://script.google.com/macros/s/AKfycbzk36B1xp3K6RzlxrhyLuGc_N-m7se3nwhnck5sH67NykMYjRzEdL-LIEmep3cpNDFsSA/exec"
-+ encodeURIComponent(decodedText)
-);
+  fetch(
+    "https://script.google.com/macros/s/AKfycbzk36B1xp3K6RzlxrhyLuGc_N-m7se3nwhnck5sH67NykMYjRzEdL-LIEmep3cpNDFsSA/exec?voucher="
+    + encodeURIComponent(decodedText),
+    {
+      method: "GET",
+      mode: "no-cors"
+    }
+  );
 
   scanner.stop();
-
-  // Future:
-  // call Google Apps Script
-  // check voucher
-  // redeem voucher
 }
 
 function startScanner() {
@@ -78,9 +77,7 @@ function startScanner() {
   scanner = new Html5Qrcode("reader");
 
   scanner.start(
-    {
-      facingMode: "environment"
-    },
+    { facingMode: "environment" },
     {
       fps: 10,
       qrbox: 250
