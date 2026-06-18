@@ -1,89 +1,296 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Dive Hrzn Voucher Scanner</title>
+<meta charset="UTF-8">
+<title>Dive Hrzn Voucher Scanner</title>
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-  <style>
-    body{
-      font-family: Arial, sans-serif;
-      text-align:center;
-      margin:20px;
-    }
+<style>
 
-    #reader{
-      width:350px;
-      margin:auto;
-    }
+body{
+font-family:Arial;
+padding:20px;
+text-align:center;
+}
 
-    #result{
-      margin-top:20px;
-      font-size:24px;
-      font-weight:bold;
-      color:green;
-    }
+#reader{
+width:350px;
+margin:auto;
+}
 
-    button{
-      margin-top:20px;
-      padding:10px 20px;
-      font-size:16px;
-      cursor:pointer;
-    }
-  </style>
+.card{
+max-width:500px;
+margin:20px auto;
+padding:20px;
+border:1px solid #ddd;
+border-radius:10px;
+display:none;
+}
+
+button{
+padding:10px 20px;
+margin:5px;
+cursor:pointer;
+}
+
+.mode{
+margin-bottom:20px;
+}
+
+</style>
+
 </head>
-
 <body>
 
 <h2>Dive Hrzn Voucher Scanner</h2>
 
+<div class="mode">
+
+<label>
+<input type="radio"
+name="mode"
+value="office"
+checked>
+Office Mode
+</label>
+
+<label style="margin-left:20px;">
+<input type="radio"
+name="mode"
+value="mobile">
+Mobile Mode
+</label>
+
+</div>
+
 <div id="reader"></div>
 
 <div id="result">
-  Waiting for scan...
+Waiting for scan...
 </div>
 
-<button onclick="startScanner()">
-  Restart Scanner
+<div class="card" id="voucherCard">
+
+<h3 id="customer"></h3>
+
+<p>
+Voucher:
+<span id="voucher"></span>
+</p>
+
+<p>
+Type:
+<span id="type"></span>
+</p>
+
+<p>
+Expiry:
+<span id="expiry"></span>
+</p>
+
+<p>
+Status:
+<span id="status"></span>
+</p>
+
+<button id="redeemBtn"
+onclick="redeemVoucher()">
+REDEEM
+</button>
+
+<button id="renewBtn"
+onclick="renewVoucher()">
+RENEW
+</button>
+
+<button onclick="resetScanner()">
+CLEAR
+</button>
+
+</div>
+
+<button onclick="resetScanner()">
+Restart Scanner
 </button>
 
 <script>
 
 let scanner;
+let currentVoucher="";
 
-function onScanSuccess(decodedText) {
+const OFFICE_URL =
+"https://script.google.com/macros/s/AKfycbzk36B1xp3K6RzlxrhyLuGc_N-m7se3nwhnck5sH67NykMYjRzEdL-LIEmep3cpNDFsSA/exec";
 
-  document.getElementById("result").innerHTML =
-    "Voucher: " + decodedText;
+const MOBILE_URL =
+"https://script.google.com/macros/s/AKfycbyWxA4-nIxvheiIWOeIXEL7rwetJSoQKsXW6PkTeZFqRp9IRbi6c6tZbIlTVgkoal8Ojg/exec";
 
-  fetch(
-    "https://script.google.com/macros/s/AKfycbzk36B1xp3K6RzlxrhyLuGc_N-m7se3nwhnck5sH67NykMYjRzEdL-LIEmep3cpNDFsSA/exec?voucher="
-    + encodeURIComponent(decodedText),
-    {
-      method: "GET",
-      mode: "no-cors"
-    }
-  );
+function onScanSuccess(decodedText){
 
-  scanner.stop();
+currentVoucher =
+extractVoucherCode(decodedText);
+
+const mode =
+document.querySelector(
+'input[name="mode"]:checked'
+).value;
+
+if(mode==="office"){
+
+document.getElementById("result")
+.innerHTML=
+"Sending to dashboard : "
++ decodedText;
+
+fetch(
+OFFICE_URL +
+"?voucher=" +
+encodeURIComponent(decodedText),
+{
+method:"GET",
+mode:"no-cors"
+}
+);
+
+scanner.stop();
+
+return;
 }
 
-function startScanner() {
+loadVoucher(decodedText);
 
-  document.getElementById("result").innerHTML =
-    "Waiting for scan...";
+}
+function extractVoucherCode(text){
 
-  scanner = new Html5Qrcode("reader");
+  const match =
+  text.match(/DH-[A-Z]+-\d+/);
 
-  scanner.start(
-    { facingMode: "environment" },
-    {
-      fps: 10,
-      qrbox: 250
-    },
-    onScanSuccess
-  );
+  if(match){
+    return match[0];
+  }
+
+  return text;
+}
+async function loadVoucher(voucherId){
+
+const res =
+await fetch(
+MOBILE_URL +
+"?action=check&voucher=" +
+encodeURIComponent(voucherId)
+);
+
+const data =
+await res.json();
+
+if(!data.success){
+
+alert("Voucher not found");
+return;
+}
+
+document.getElementById("voucherCard")
+.style.display="block";
+
+document.getElementById("customer")
+.innerText=data.customer;
+
+document.getElementById("voucher")
+.innerText=data.voucher;
+
+document.getElementById("type")
+.innerText=data.type;
+
+document.getElementById("expiry")
+.innerText=data.expiry;
+
+document.getElementById("status")
+.innerText=data.status;
+
+document.getElementById("redeemBtn")
+.style.display=
+data.status==="VALID"
+? "inline-block"
+: "none";
+
+document.getElementById("renewBtn")
+.style.display=
+data.status==="EXPIRED"
+? "inline-block"
+: "none";
+
+scanner.stop();
+
+}
+
+async function redeemVoucher(){
+
+await fetch(
+MOBILE_URL +
+"?action=redeem&voucher=" +
+encodeURIComponent(currentVoucher)
+);
+
+alert("Voucher Redeemed");
+
+resetScanner();
+
+}
+
+async function renewVoucher(){
+
+await fetch(
+MOBILE_URL +
+"?action=renew&voucher=" +
+encodeURIComponent(currentVoucher)
+);
+
+alert("Voucher Renewed");
+
+resetScanner();
+
+}
+
+function resetScanner(){
+
+document.getElementById("voucherCard")
+.style.display="none";
+
+document.getElementById("result")
+.innerHTML=
+"Waiting for scan...";
+
+startScanner();
+
+}
+
+function startScanner(){
+
+if(scanner){
+
+try{
+scanner.stop();
+}catch(e){}
+
+try{
+scanner.clear();
+}catch(e){}
+}
+
+scanner=
+new Html5Qrcode("reader");
+
+scanner.start(
+{
+facingMode:"environment"
+},
+{
+fps:10,
+qrbox:250
+},
+onScanSuccess
+);
+
 }
 
 startScanner();
